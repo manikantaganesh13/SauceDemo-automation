@@ -14,15 +14,16 @@ public class InventoryPage extends BasePage{
     By title = By.cssSelector("[data-test='title]");
     By cartLink = By.className("shopping_cart_link");
     By cartBadge = By.className("shopping_cart_badge");
+    By menuBtn = By.id("react-burger-menu-btn");
+    By logoutLink = By.id("logout_sidebar_link");
 
     public InventoryPage(WebDriver driver){
         this.driver = driver;
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
     }
 
-    public boolean isLoaded() {
-        return wait.until(ExpectedConditions.visibilityOfElementLocated(title))
-                .getText().equals("Products");
+    public void isLoaded() {
+         wait.until(ExpectedConditions.urlContains("inventory.html"));
     }
 
     public By addButton(String product){
@@ -34,16 +35,23 @@ public class InventoryPage extends BasePage{
     }
 
     public InventoryPage addToCart(String product){
+        System.out.println("inside add to cart ");
         wait.until(ExpectedConditions.elementToBeClickable(addButton(product))).click();
+        System.out.println("added toc cart");
         return this;
     }
 
     public InventoryPage removeFromCart(String product){
-        wait.until(ExpectedConditions.elementToBeClickable(addButton(product))).click();
+        wait.until(ExpectedConditions.elementToBeClickable(removeButton(product))).click();
         return this;
     }
 
     public void openCart(){
         driver.findElement(cartLink).click();
+    }
+
+    public void logout() {
+        driver.findElement(menuBtn).click();
+        wait.until(ExpectedConditions.elementToBeClickable(logoutLink)).click();
     }
 }
