@@ -41,8 +41,9 @@ public class InventoryPage extends BasePage{
         return this;
     }
 
-    public void removeFromCart(String product){
+    public InventoryPage removeFromCart(String product){
         wait.until(ExpectedConditions.elementToBeClickable(removeButton(product))).click();
+        return this;
 
     }
 
@@ -51,7 +52,8 @@ public class InventoryPage extends BasePage{
     }
 
     public int getCartCount(){
-        return Integer.parseInt(driver.findElement(cartBadge).getText());
+        List<WebElement> badge = driver.findElements(cartBadge);
+        return badge.isEmpty() ? 0 : Integer.parseInt(badge.get(0).getText());
     }
 
     public void logout() {

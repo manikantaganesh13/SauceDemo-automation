@@ -10,7 +10,10 @@ import pages.CheckoutPage;
 import pages.InventoryPage;
 import pages.LoginPage;
 import pages.CartPage;
+import utils.TestData;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Duration;
 import java.util.List;
 
@@ -21,6 +24,7 @@ public class E2ETests extends BaseTest{
     String bikeLight = "bike-light";
     String tshirt = "bolt-t-shirt";
     String jacket = "fleece-jacket";
+    String onsie = "onesie";
 
     @Test
     public void singleItemPurchase(){
@@ -80,5 +84,63 @@ public class E2ETests extends BaseTest{
         checkout.clickFinish();
         Assert.assertEquals(checkout.getConfirmationMessage(), "Thank you for your order!");
 
+    }
+
+    //price check
+    @Test
+    public void priceValidation(){
+        new LoginPage(driver).doLogin("standard_user","secret_sauce");
+
+        InventoryPage inventory = new InventoryPage(driver);
+        inventory.isLoaded();
+        inventory.addToCart(backpack).addToCart(onsie).addToCart(tshirt).openCart();
+
+        CartPage cart = new CartPage(driver);
+        cart.clickCheckOut();
+
+        CheckoutPage checkout = new CheckoutPage(driver);
+        checkout.fillInfo("Sam","ternus","877655");
+        checkout.clickContinue();
+
+        BigDecimal expectedSubTotal = TestData.PRICES.get(backpack)
+                .add(TestData.PRICES.get(onsie))
+                .add(TestData.PRICES.get(tshirt));
+
+        BigDecimal expectedTax = expectedSubTotal.multiply(new BigDecimal(0.08)).
+                setScale(2, RoundingMode.HALF_UP);
+
+        Assert.assertEquals(checkout.getSubTotal(),expectedSubTotal,"Item total mismatch");
+        Assert.assertEquals(checkout.getTax(),expectedTax,"Tax mismatch");
+        Assert.assertEquals(checkout.getTotal(),expectedSubTotal.add(expectedTax),"Total mismatch");
+
+        checkout.clickFinish();
+        Assert.assertEquals(checkout.getConfirmationMessage(),"Thank you for your order!");
+    }
+
+    //Two consecutive orders
+    @Test
+    public void twoConsecutiveOrders(){
+        new LoginPage(driver).doLogin("standard_user","secret_sauce");
+
+        InventoryPage inventory = new InventoryPage(driver);
+        inventory.isLoaded();
+        inventory.addToCart(backpack).openCart();
+
+        CartPage cart = new CartPage(driver);
+        cart.clickCheckOut();
+
+        CheckoutPage checkout = new CheckoutPage(driver);
+        checkout.fillInfo("John","Smith","123456");
+        checkout.clickContinue();
+        checkout.clickFinish();
+        Assert.assertEquals(inventory.getCartCount(),0,"Cart count should be empty after order");
+        checkout.clickBack();
+
+        inventory.addToCart(onsie).openCart();
+        cart.clickCheckOut();
+        checkout.fillInfo("John","Smith","123456");
+        checkout.clickContinue();
+        checkout.clickFinish();
+        Assert.assertEquals(checkout.getConfirmationMessage(),"Thank you for your order!");
     }
 }

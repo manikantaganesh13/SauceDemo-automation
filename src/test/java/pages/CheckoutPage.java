@@ -2,9 +2,12 @@ package pages;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import javax.swing.*;
+import java.math.BigDecimal;
 import java.time.Duration;
 
 public class CheckoutPage {
@@ -24,6 +27,9 @@ public class CheckoutPage {
     By finishBtn = By.id("finish");
     By completeHeader = By.cssSelector("[data-test='complete-header']");
     By back_home = By.id("back-to-products");
+    By subTotal = By.className("summary_subtotal_label");
+    By tax = By.className("summary_tax_label");
+    By total = By.className("summary_total_label");
 
     public void fillInfo(String first,String last,String pcode){
         type(firstName,first);
@@ -49,5 +55,20 @@ public class CheckoutPage {
 
     public void clickBack(){
         driver.findElement(back_home).click();
+    }
+
+    public BigDecimal getSubTotal(){
+        String amount = driver.findElement(subTotal).getText();
+        return new BigDecimal(amount.substring(amount.indexOf('$')+1));
+    }
+
+    public BigDecimal getTax(){
+        String amount = driver.findElement(tax).getText();
+        return new BigDecimal(amount.substring(amount.indexOf('$')+1));
+    }
+
+    public BigDecimal getTotal(){
+        String amount = driver.findElement(total).getText();
+        return new BigDecimal(amount.substring(amount.indexOf('$')+1));
     }
 }

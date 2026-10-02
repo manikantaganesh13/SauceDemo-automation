@@ -10,6 +10,8 @@
                 <methods>
                     <include name="singleItemPurchase"/>
                     <include name="addRemoveThenBuyRemainingItem"/>
+                    <include name="priceValidation"/>
+                    <include name="twoConsecutiveOrders"/>
                 </methods>
             </class>
         </classes>
