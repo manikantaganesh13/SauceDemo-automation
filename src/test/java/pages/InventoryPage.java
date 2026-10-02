@@ -2,10 +2,12 @@ package pages;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
+import java.util.List;
 
 public class InventoryPage extends BasePage{
     WebDriver driver;
@@ -35,19 +37,21 @@ public class InventoryPage extends BasePage{
     }
 
     public InventoryPage addToCart(String product){
-        System.out.println("inside add to cart ");
         wait.until(ExpectedConditions.elementToBeClickable(addButton(product))).click();
-        System.out.println("added toc cart");
         return this;
     }
 
-    public InventoryPage removeFromCart(String product){
+    public void removeFromCart(String product){
         wait.until(ExpectedConditions.elementToBeClickable(removeButton(product))).click();
-        return this;
+
     }
 
     public void openCart(){
         driver.findElement(cartLink).click();
+    }
+
+    public int getCartCount(){
+        return Integer.parseInt(driver.findElement(cartBadge).getText());
     }
 
     public void logout() {
