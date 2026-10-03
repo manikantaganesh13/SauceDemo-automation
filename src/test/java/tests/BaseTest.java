@@ -1,5 +1,8 @@
 package tests;
 
+import com.aventstack.extentreports.ExtentReports;
+import com.aventstack.extentreports.ExtentTest;
+import com.aventstack.extentreports.reporter.ExtentSparkReporter;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.edge.EdgeDriver;
@@ -12,6 +15,7 @@ import org.testng.annotations.BeforeMethod;
 public class BaseTest {
     WebDriver driver;
     WebDriverWait wait;
+
 
     @BeforeMethod
     public void setUp(){

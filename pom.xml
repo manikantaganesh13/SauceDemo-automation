@@ -27,6 +27,12 @@
             <artifactId>testng</artifactId>
             <version>7.10.2</version> <!-- Use the latest stable version -->
         </dependency>
+
+        <dependency>
+            <groupId>com.aventstack</groupId>
+            <artifactId>extentreports</artifactId>
+            <version>5.1.2</version>
+        </dependency>
     </dependencies>
 
 </project>

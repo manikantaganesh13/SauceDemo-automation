@@ -4,6 +4,11 @@
 
 <suite name="Automation Suite">
 
+    <listeners>
+        <listener class-name="listeners.TestListener"/>
+    </listeners>
+
+
     <test name="Login Test">
         <classes>
             <class name="tests.E2ETests">
@@ -12,6 +17,7 @@
                     <include name="addRemoveThenBuyRemainingItem"/>
                     <include name="priceValidation"/>
                     <include name="twoConsecutiveOrders"/>
+                    <include name="sortByPriceThenBuyCheapest"/>
                 </methods>
             </class>
         </classes>

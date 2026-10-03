@@ -6,6 +6,8 @@ import java.util.Map;
 
 public class TestData {
 //    public static final String PASSWORD = "secret_sauce";
+      public static BigDecimal TAX_RATE = new BigDecimal("0.08");
+
 
     public static final Map<String, BigDecimal> PRICES = Map.of(
             "backpack", new BigDecimal("29.99"),

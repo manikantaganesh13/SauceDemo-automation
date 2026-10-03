@@ -1,5 +1,8 @@
 package tests;
 
+import com.aventstack.extentreports.ExtentReports;
+import com.aventstack.extentreports.ExtentTest;
+import com.aventstack.extentreports.reporter.ExtentSparkReporter;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
@@ -15,6 +18,8 @@ import utils.TestData;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class E2ETests extends BaseTest{
@@ -26,6 +31,30 @@ public class E2ETests extends BaseTest{
     String jacket = "fleece-jacket";
     String onsie = "onesie";
 
+//    @Test
+//    public void test(){
+//        ExtentSparkReporter spark =
+//                new ExtentSparkReporter(
+//                        "Reports/ExtentReport.html"
+//                );
+//
+//        ExtentReports extent = new ExtentReports();
+//
+//        extent.attachReporter(spark);
+//
+//        ExtentTest test =
+//                extent.createTest("Sample Test");
+//
+//        test.info("Test execution started");
+//
+//        test.pass("Test passed successfully");
+//
+//        extent.flush();
+//
+//        System.out.println("Report generated successfully!");
+//
+//    }
+
     @Test
     public void singleItemPurchase(){
         LoginPage login = new LoginPage(driver);
@@ -34,7 +63,6 @@ public class E2ETests extends BaseTest{
         InventoryPage inventory = new InventoryPage(driver);
         inventory.isLoaded();
         inventory.addToCart("backpack");
-//        inventory.addToCart();
         inventory.openCart();
 
         CartPage cart = new CartPage(driver);
@@ -47,11 +75,11 @@ public class E2ETests extends BaseTest{
         checkout.clickFinish();
 
         Assert.assertEquals(checkout.getConfirmationMessage(), "Thank you for your order!");
+
         checkout.clickBack();
 
         inventory.logout();
         Assert.assertEquals(driver.getCurrentUrl(), "https://www.saucedemo.com/");
-
     }
 
     @Test
@@ -142,5 +170,45 @@ public class E2ETests extends BaseTest{
         checkout.clickContinue();
         checkout.clickFinish();
         Assert.assertEquals(checkout.getConfirmationMessage(),"Thank you for your order!");
+    }
+
+    @Test
+    public void sortByPriceThenBuyCheapest(){
+        new LoginPage(driver).doLogin("standard_user","secret_sauce");
+
+        InventoryPage inventory = new InventoryPage(driver);
+        inventory.isLoaded();
+        //click sort dd and select price low to high
+        inventory.sortBy("Price (low to high)");
+
+        List<BigDecimal> displayedPrices = inventory.getAllPricesAsDecimal();
+        List<BigDecimal> expectedOrder = new ArrayList<>(displayedPrices);
+        Collections.sort(expectedOrder);
+        Assert.assertEquals(displayedPrices,expectedOrder,"Products are not sorted by price (low to high)");
+
+        BigDecimal cheapestPrice = Collections.min(displayedPrices);
+        Assert.assertEquals(displayedPrices.get(0), cheapestPrice,"First product is not the cheapest one");
+
+        String pickedName = inventory.addFirstProductToCart();
+
+        inventory.openCart();
+        CartPage cart = new CartPage(driver);
+        cart.clickCheckOut();
+
+        CheckoutPage checkout = new CheckoutPage(driver);
+        checkout.fillInfo("Harry","Brook","456789");
+        checkout.clickContinue();
+
+        BigDecimal expectedTax = cheapestPrice.multiply(TestData.TAX_RATE)
+                .setScale(2, RoundingMode.HALF_UP);
+        BigDecimal expectedTotal = cheapestPrice.add(expectedTax);
+
+        Assert.assertEquals(checkout.getSubTotal(), cheapestPrice, "Item total mismatch");
+        Assert.assertEquals(checkout.getTax(), expectedTax, "Tax mismatch");
+        Assert.assertEquals(checkout.getTotal(), expectedTotal, "Total mismatch");
+
+        checkout.clickFinish();
+        Assert.assertEquals(checkout.getConfirmationMessage(), "Thank you for your order!");
+
     }
 }
