@@ -2,6 +2,7 @@ package tests;
 
 import com.aventstack.extentreports.ExtentReports;
 import com.aventstack.extentreports.ExtentTest;
+import com.aventstack.extentreports.gherkin.model.Given;
 import com.aventstack.extentreports.reporter.ExtentSparkReporter;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -210,5 +211,51 @@ public class E2ETests extends BaseTest{
         checkout.clickFinish();
         Assert.assertEquals(checkout.getConfirmationMessage(), "Thank you for your order!");
 
+    }
+
+    @Test
+    public void checkoutErrorThenRecover(){
+        new LoginPage(driver).doLogin("standard_user","secret_sauce");
+
+        InventoryPage inventory = new InventoryPage(driver);
+        inventory.isLoaded();
+        inventory.addToCart(backpack).openCart();
+
+        CartPage cart = new CartPage(driver);
+        cart.clickCheckOut();
+
+        CheckoutPage checkout = new CheckoutPage(driver);
+        checkout.clickContinue();
+        Assert.assertTrue(checkout.getErrorMessage().contains("First Name is required"));
+
+        checkout.fillInfo("John","","");
+        checkout.clickContinue();
+        Assert.assertTrue(checkout.getErrorMessage().contains("Last Name is required"));
+
+        checkout.fillInfo("John","Doe","");
+        checkout.clickContinue();
+        Assert.assertTrue(checkout.getErrorMessage().contains("Postal Code is required"));
+
+        checkout.fillInfo("John","Doe","13234");
+        checkout.clickContinue();
+        checkout.clickFinish();
+        Assert.assertEquals(checkout.getConfirmationMessage(),"Thank you for your order!");
+    }
+
+    @Test
+    public void loggedOutUserCannotOpenCheckoutDirectly(){
+        new LoginPage(driver).doLogin("standard_user","secret_sauce");
+
+        InventoryPage inventory = new InventoryPage(driver);
+        inventory.isLoaded();
+        inventory.addToCart(backpack).openCart();
+
+        CartPage cart = new CartPage(driver);
+        cart.clickCheckOut();
+
+        inventory.logout();
+
+        driver.get("https://www.saucedemo.com/checkout-step-two.html");
+        Assert.assertTrue(new LoginPage(driver).getErrorMessage().contains("You can only access '/checkout-step-two.html' when you are logged in"));
     }
 }

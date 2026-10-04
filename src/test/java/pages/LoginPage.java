@@ -20,6 +20,7 @@ public class LoginPage {
     By username = By.xpath("//input[@id='user-name']");
     By password = By.xpath("//input[@id='password']");
     By login_btn = By.xpath("//input[@id='login-button']");
+    By error = By.cssSelector("[data-test='error']");
 
 
     public void doLogin(String uname,String pwd){
@@ -28,4 +29,7 @@ public class LoginPage {
         wait.until(ExpectedConditions.elementToBeClickable(login_btn)).click();
     }
 
+    public String getErrorMessage() {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(error)).getText();
+    }
 }

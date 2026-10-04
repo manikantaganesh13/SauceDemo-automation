@@ -8,7 +8,6 @@
         <listener class-name="listeners.TestListener"/>
     </listeners>
 
-
     <test name="Login Test">
         <classes>
             <class name="tests.E2ETests">
@@ -18,6 +17,8 @@
                     <include name="priceValidation"/>
                     <include name="twoConsecutiveOrders"/>
                     <include name="sortByPriceThenBuyCheapest"/>
+                    <include name="checkoutErrorThenRecover"/>
+                    <include name="loggedOutUserCannotOpenCheckoutDirectly"/>
                 </methods>
             </class>
         </classes>

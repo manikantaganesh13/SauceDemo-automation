@@ -30,6 +30,7 @@ public class CheckoutPage {
     By subTotal = By.className("summary_subtotal_label");
     By tax = By.className("summary_tax_label");
     By total = By.className("summary_total_label");
+    By error = By.cssSelector("[data-test='error']");
 
     public void fillInfo(String first,String last,String pcode){
         type(firstName,first);
@@ -38,6 +39,7 @@ public class CheckoutPage {
     }
 
     public void type(By locator,String value){
+        driver.findElement(locator).clear();
         driver.findElement(locator).sendKeys(value);
     }
 
@@ -55,6 +57,10 @@ public class CheckoutPage {
 
     public void clickBack(){
         driver.findElement(back_home).click();
+    }
+
+    public String getErrorMessage(){
+        return driver.findElement(error).getText();
     }
 
     public BigDecimal getSubTotal(){
